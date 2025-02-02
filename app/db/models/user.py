@@ -9,11 +9,13 @@ class User(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=False)
+    username = Column(String(255), unique=True, nullable=False)
     email = Column(String(255), unique=True, nullable=False)
     phone = Column(String(255))
     date_of_birth = Column(DateTime, nullable=True)
     hashed_password = Column(String(1055))
     is_active = Column(Boolean, default=True)
+    is_global_admin = Column(Boolean, default=True)
     tenant_id = Column(Integer, ForeignKey('tenants.id'), nullable=True)
     outlet_id = Column(Integer, ForeignKey('outlets.id'), nullable=True)
     phone_verified = Column(Boolean, default=False)
@@ -26,7 +28,7 @@ class User(Base):
     outlet = relationship('Outlet', back_populates='users')
     roles = relationship('UserRole', back_populates='user')
     global_admin = relationship('GlobalAdmin', uselist=False, back_populates='user')
-    addresses = relationship('Address', back_populates='user', cascade='all, delete-orphan')
+    address = relationship('Address', back_populates='user', cascade='all, delete-orphan')
 
     def __repr__(self):
         return f"<User(id={self.id}, name={self.name}, email={self.email})>"
@@ -38,6 +40,7 @@ class GlobalAdmin(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id'), unique=True, nullable=False)  # Link to User
     user = relationship('User', back_populates='global_admin')
+    is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
     def __repr__(self):
@@ -72,6 +75,7 @@ class Address(Base):
     state = Column(String(100), nullable=True)
     postal_code = Column(String(20), nullable=True)
     country = Column(String(100), nullable=False)
+    is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
     user = relationship('User', back_populates='address')

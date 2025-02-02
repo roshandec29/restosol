@@ -26,12 +26,16 @@ class Tenant(Base):
     contact_phone = Column(String(20))
     billing_address = Column(Text)
     subscription_plan = Column(Enum(SubscriptionPlan), default=SubscriptionPlan.BASIC)
+    is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
     outlets = relationship("Outlet", back_populates="tenant")
     integrations = relationship("TenantIntegration", back_populates="tenant")
     billing = relationship("TenantBilling", back_populates="tenant")
+    users = relationship('User', back_populates='tenant')
+    user_roles = relationship('UserRole', back_populates='tenant')
+    roles = relationship('Role', back_populates='tenant')
 
 
 class Outlet(Base):
@@ -54,6 +58,9 @@ class Outlet(Base):
     tenant = relationship("Tenant", back_populates="outlets")
     analytics = relationship("OutletAnalytics", back_populates="outlet")
     integrations = relationship("TenantIntegration", back_populates="outlet")
+    users = relationship('User', back_populates='outlet')
+    user_roles = relationship('UserRole', back_populates='outlet')
+
 
 
 class TenantIntegration(Base):

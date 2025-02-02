@@ -9,7 +9,7 @@ class DBSync:
     all_sessions: List[Session] = []
 
     def __init__(self):
-        DB_URL = "mysql+pymysql://root:root@localhost:3306/qrapp"
+        DB_URL = "mysql+pymysql://root:root@localhost:3306/restosol"
         self.engine = create_engine(DB_URL)
         Base.metadata.create_all(bind=self.engine)
         self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
