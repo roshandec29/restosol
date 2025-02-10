@@ -6,13 +6,15 @@ from app.api.v1.google_oauth import router as google_router
 from starlette.middleware.sessions import SessionMiddleware
 from app.db.schema.email import EmailRequest
 from app.utils.email import send_email
+from app.config import config
 
+SECRET_KEY=config.SECRET_KEY
 
 db = DBSync()
 app = FastAPI()
 app.include_router(user_router, prefix="/user", tags=["RestoSol"])
 app.include_router(google_router, prefix="/google_auth", tags=["RestoSol"])
-app.add_middleware(SessionMiddleware, secret_key="9b847788b25b7551a4f5143f47c324f7166b67cb1856f6f68b75228a202fd83d")
+app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
 
 @app.get("/health")
 async def health():
