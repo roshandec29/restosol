@@ -2,13 +2,12 @@ import datetime
 from datetime import timedelta
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-import json
-from sqlalchemy.orm.state import InstanceState
+from app.config import config
 
-SECRET_KEY = "9b847788b25b7551a4f5143f47c324f7166b67cb1856f6f68b75228a202fd83d"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-REFRESH_TOKEN_EXPIRE_DAYS = 7
+SECRET_KEY = config.SECRET_KEY
+ALGORITHM = config.ALGORITHM
+ACCESS_TOKEN_EXPIRE_MINUTES = config.ACCESS_TOKEN_EXPIRE_MINUTES
+REFRESH_TOKEN_EXPIRE_DAYS = config.REFRESH_TOKEN_EXPIRE_DAYS
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
