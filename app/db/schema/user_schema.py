@@ -23,6 +23,8 @@ class UserBase(BaseModel):
     phone_verified: Optional[bool] = False
     email_verified: Optional[bool] = False
     preferences: Optional[str] = None
+    tenant_id: Optional[int] = None
+    outlet_id: Optional[int] = None
 
 
 class UserCreate(UserBase):
@@ -45,8 +47,8 @@ class UserRegisterRequest(BaseModel):
     name: str
     phone: Optional[str] = None
     date_of_birth: Optional[datetime] = None
-    tenant_id: Optional[int] = None  # Optional tenant ID
-    outlet_id: Optional[int] = None  # Optional outlet ID
+    tenant_id: Optional[int] = None
+    outlet_id: Optional[int] = None
     email_verified: bool = False
     phone_verified: bool = False
     is_global_admin: bool = False

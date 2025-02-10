@@ -14,7 +14,7 @@ def get_user(db: Session, username: str) -> User | None:
     """
     Fetch a user from the database by username.
     """
-    result = db.query(User.id, User.username, User.email).filter(User.username == username).first()
+    result = db.query(User).filter(User.username == username).first()
 
     return result if result else None
 
@@ -133,7 +133,6 @@ def user_registration(user, session, db):
         hashed_password=hash_password(user.password),
         tenant_id=user.tenant_id,
         outlet_id=user.outlet_id,
-        is_global_admin=user.is_global_admin,
         is_active=True,
         phone_verified=True if user.phone_verified else False,
         email_verified=True if user.email_verified else False,
@@ -159,6 +158,5 @@ def user_registration(user, session, db):
         created_at=new_user.created_at,
         preferences=new_user.preferences,
         tenant_id=new_user.tenant_id,
-        outlet_id=new_user.outlet_id,
-        is_global_admin=new_user.is_global_admin
+        outlet_id=new_user.outlet_id
     )

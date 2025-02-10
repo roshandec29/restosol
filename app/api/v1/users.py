@@ -2,10 +2,11 @@ import os
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from app.utils.utils import create_access_token, hash_password, create_refresh_token, decode_token
+from app.utils.email import send_email, registration_email
 from app.db.schema.user_schema import Token, UserResponse, UserRegisterRequest
 from app.services.user_service import authenticate_user, get_user, user_registration
 from app.db.session import DBSync
-
+import asyncio
 
 router = APIRouter()
 
@@ -20,8 +21,22 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token = create_access_token(data={"username": user.username})
-    refresh_token = create_refresh_token({"sub": user.username})
+    user_data= {
+                  "id": user.id,
+                  "name": user.name,
+                  "username": user.username,
+                  "email": user.email,
+                  "phone": user.phone,
+                  "is_active": user.is_active,
+                  "is_global_admin": user.is_global_admin,
+                  "tenant_id": user.tenant_id,
+                  "outlet_id": user.outlet_id,
+                  "phone_verified": user.phone_verified,
+                  "email_verified": user.email_verified,
+                }
+
+    access_token = create_access_token(data= user_data)
+    refresh_token = create_refresh_token(user_data)
 
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
@@ -71,4 +86,23 @@ def register_user(user: UserRegisterRequest):
     db = DBSync()
     session = db.get_new_session()
     response = user_registration(user, session, db)
+    if response and response.username:
+        user_data = {
+            "id": response.id,
+            "name": response.name,
+            "username": response.username,
+            "email": response.email,
+            "phone": response.phone,
+            "is_active": response.is_active,
+            "tenant_id": response.tenant_id,
+            "outlet_id": response.outlet_id,
+            "phone_verified": response.phone_verified,
+            "email_verified": response.email_verified,
+        }
+        access_token = create_access_token(data=user_data)
+        refresh_token = create_refresh_token(user_data)
+
+        asyncio.create_task(send_email(response.email, "Registration Successful!", registration_email()))
+        return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
+
     return response

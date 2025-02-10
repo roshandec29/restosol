@@ -30,6 +30,9 @@ class User(Base):
     global_admin = relationship('GlobalAdmin', uselist=False, back_populates='user')
     address = relationship('Address', back_populates='user', cascade='all, delete-orphan')
 
+    def as_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+
     def __repr__(self):
         return f"<User(id={self.id}, name={self.name}, email={self.email})>"
 
