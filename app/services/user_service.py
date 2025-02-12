@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
-from app.db.models.user import User
+from app.db.models.user import User, UserRole
+from app.db.models.roles import Role
 from app.utils.utils import verify_password, decode_token
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -96,34 +97,31 @@ def user_registration(user, session, db):
             detail="Email already registered"
         )
 
-    # Validate tenant and outlet for non-global admin users
-    if not user.is_global_admin:
-        if user.tenant_id is None or user.outlet_id is None:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Tenant ID and Outlet ID are required for non-global admin users"
-            )
+    if user.tenant_id is None or user.outlet_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Tenant ID and Outlet ID are required for non-global admin users"
+        )
 
-        # Check if tenant and outlet exist
-        tenant = session.query(Tenant).filter(Tenant.id == user.tenant_id).first()
-        if not tenant:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Tenant not found"
-            )
+    tenant = session.query(Tenant).filter(Tenant.id == user.tenant_id).first()
+    if not tenant:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Tenant not found"
+        )
 
-        outlet = session.query(Outlet).filter(Outlet.id == user.outlet_id).first()
-        if not outlet:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Outlet not found"
-            )
-    else:
-        # For global admin users, set tenant_id and outlet_id to None
-        user.tenant_id = None
-        user.outlet_id = None
+    outlet = session.query(Outlet).filter(Outlet.id == user.outlet_id).first()
+    if not outlet:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Outlet not found"
+        )
 
-    # Create new user
+    customer_role = session.query(Role.id).filter(Role.name == "customer",
+                                                  Role.tenant_id == user.tenant_id).first()
+    if not customer_role:
+        raise ValueError(f"Role 'customer' not found for tenant {user.tenant_id}")
+
     new_user = User(
         username=user.username,
         email=user.email,
@@ -142,10 +140,21 @@ def user_registration(user, session, db):
     session.add(new_user)
     session.commit()
     session.refresh(new_user)
-    db.close_session(session)
 
-    return UserResponse(
+    user_role = UserRole(
+        role_id=customer_role.id,
+        user_id=new_user.id,
+        tenant_id=user.tenant_id,
+        outlet_id=user.outlet_id
+    )
+
+    session.add(user_role)
+    session.commit()
+    session.refresh(new_user)
+
+    response = UserResponse(
         id=new_user.id,
+        role_id=user_role.role_id,
         username=new_user.username,
         email=new_user.email,
         name=new_user.name,
@@ -160,3 +169,7 @@ def user_registration(user, session, db):
         tenant_id=new_user.tenant_id,
         outlet_id=new_user.outlet_id
     )
+
+    db.close_session(session)
+
+    return response

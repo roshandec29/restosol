@@ -89,6 +89,7 @@ def register_user(user: UserRegisterRequest):
     if response and response.username:
         user_data = {
             "id": response.id,
+            "role_id": response.role_id,
             "name": response.name,
             "username": response.username,
             "email": response.email,

@@ -7,24 +7,48 @@ from .base import Base
 
 
 class RoleEnum(str, Enum):
-    ADMIN = "admin"
-    RESTAURANT_ADMIN = "restaurant_admin"
-    RESTAURANT_STAFF = "restaurant_staff"
-    DELIVERY_BOY = "delivery_boy"
-    END_USER = "end_user"
+    OWNER = "owner"
+    MANAGER = "manager"
+    CASHIER = "cashier"
+    STAFF = "staff"
+    SUPPLIER = "supplier"
+    CUSTOMER = "customer"
 
 
 class PermissionEnum(str, Enum):
-    CREATE_RESTAURANT = "create_restaurant"
-    DELETE_RESTAURANT = "delete_restaurant"
-    VIEW_ANALYTICS = "view_analytics"
-    MANAGE_BILLING = "manage_billing"
-    CONFIGURE_SETTINGS = "configure_settings"
-    MANAGE_ORDERS = "manage_orders"
-    VIEW_ORDERS = "view_orders"
-    UPDATE_DELIVERY_STATUS = "update_delivery_status"
-    RATE_RESTAURANT = "rate_restaurant"
-    UPDATE_PROFILE = "update_profile"
+    # User Management
+    CREATE_USER = "create_user"
+    UPDATE_USER = "update_user"
+    DISABLE_USER = "disable_user"
+
+    # Access Control
+    MANAGE_ROLES = "manage_roles"
+    MULTI_LOCATION_ACCESS = "multi_location_access"
+
+    # Sales & Transactions
+    PROCESS_PAYMENT = "process_payment"
+    REFUND_PAYMENT = "refund_payment"
+    GENERATE_INVOICE = "generate_invoice"
+
+    # Inventory Management
+    ADD_INVENTORY = "add_inventory"
+    EDIT_INVENTORY = "edit_inventory"
+    TRACK_INVENTORY = "track_inventory"
+
+    # Service Management
+    MANAGE_SERVICES = "manage_services"
+
+    # Bookings & Reservations
+    MANAGE_BOOKINGS = "manage_bookings"
+
+    # Reporting & Analytics
+    VIEW_REPORTS = "view_reports"
+
+    # Marketing & Promotions
+    CREATE_PROMOTIONS = "create_promotions"
+
+    # Audit & Logs
+    VIEW_AUDIT_LOGS = "view_audit_logs"
 
 
 class RolePermissions(BaseModel):
@@ -36,7 +60,7 @@ class Role(Base):
     __tablename__ = 'roles'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(255), unique=True, nullable=False)  # e.g. 'platform_admin', 'restaurant_admin'
+    name = Column(String(255), unique=True, nullable=False)  # e.g. 'platform_admin', 'outlet_admin'
     description = Column(String(255))
     tenant_id = Column(Integer, ForeignKey('tenants.id'), nullable=True)  # Tenant-specific roles
 
@@ -65,7 +89,8 @@ class Permission(Base):
     __tablename__ = 'permissions'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(255), unique=True, nullable=False)  # e.g. 'manage_restaurant', 'view_analytics'
+    name = Column(String(255), unique=True, nullable=False)  # e.g. 'manage_outlet', 'view_analytics'
+    category = Column(String(255))
     description = Column(String(255))
 
     role_permissions = relationship('RolePermission', back_populates='permission')

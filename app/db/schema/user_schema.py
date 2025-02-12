@@ -25,6 +25,7 @@ class UserBase(BaseModel):
     preferences: Optional[str] = None
     tenant_id: Optional[int] = None
     outlet_id: Optional[int] = None
+    role_id: Optional[int] = None
 
 
 class UserCreate(UserBase):
