@@ -2,3 +2,5 @@
 venv/
 .venv/
 migrations/
+.idea/*
+__pycache__/

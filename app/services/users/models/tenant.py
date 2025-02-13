@@ -1,8 +1,9 @@
 from sqlalchemy import func, DateTime, Column, String, Integer, Boolean, ForeignKey, Text, Enum, JSON, DECIMAL, Date, text
 from sqlalchemy.orm import relationship
-from .base import Base
 import enum
-from sqlalchemy.dialects.mysql import TIMESTAMP
+
+from app.services.users.models.base import Base
+
 
 class SubscriptionPlan(str, enum.Enum):
     BASIC = "basic"

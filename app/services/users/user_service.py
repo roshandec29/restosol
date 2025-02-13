@@ -1,13 +1,14 @@
 from sqlalchemy.orm import Session
-from app.db.models.user import User, UserRole
-from app.db.models.roles import Role
-from app.utils.utils import verify_password, decode_token
+from app.services.users.models.user import User, UserRole
+from app.services.users.models.roles import Role
+from app.services.users.utils.token_utils import decode_token
+from app.services.users.utils.password_utils import verify_password, hash_password
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from app.db.schema.user_schema import Token, UserResponse
+from app.db.schema.user_schema import UserResponse
 from app.db.session import DBSync
-from app.db.models.tenant import Tenant, Outlet
-from app.utils.utils import hash_password
+from app.services.users.models.tenant import Tenant, Outlet
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 

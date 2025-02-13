@@ -5,7 +5,7 @@ from app.api.v1.users import router as user_router
 from app.api.v1.google_oauth import router as google_router
 from starlette.middleware.sessions import SessionMiddleware
 from app.db.schema.email import EmailRequest
-from app.utils.email import send_email
+from app.services.communication.utils.email import send_email
 from app.config import config
 
 SECRET_KEY=config.SECRET_KEY

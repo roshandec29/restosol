@@ -3,7 +3,7 @@ from enum import Enum
 from typing import List
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-from .base import Base
+from app.services.users.models.base import Base
 
 
 class RoleEnum(str, Enum):
@@ -61,7 +61,7 @@ class Role(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(255), unique=True, nullable=False)  # e.g. 'platform_admin', 'outlet_admin'
-    description = Column(String(255))
+    description = Column(String(255), nullable=True)
     tenant_id = Column(Integer, ForeignKey('tenants.id'), nullable=True)  # Tenant-specific roles
 
     tenant = relationship('Tenant', back_populates='roles')  # Relationship to Tenant
@@ -75,8 +75,8 @@ class Role(Base):
 class RolePermission(Base):
     __tablename__ = 'role_permissions'
 
-    role_id = Column(Integer, ForeignKey('roles.id'), primary_key=True)
-    permission_id = Column(Integer, ForeignKey('permissions.id'), primary_key=True)
+    role_id = Column(Integer, ForeignKey('roles.id'))
+    permission_id = Column(Integer, ForeignKey('permissions.id'))
 
     role = relationship('Role', back_populates='role_permissions')
     permission = relationship('Permission', back_populates='role_permissions')

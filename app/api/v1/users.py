@@ -1,10 +1,9 @@
-import os
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from app.utils.utils import create_access_token, hash_password, create_refresh_token, decode_token
-from app.utils.email import send_email, registration_email
+from app.services.users.utils.token_utils import create_access_token, create_refresh_token, decode_token
+from app.services.communication.utils.email import send_email, registration_email
 from app.db.schema.user_schema import Token, UserResponse, UserRegisterRequest
-from app.services.user_service import authenticate_user, get_user, user_registration
+from app.services.users.user_service import authenticate_user, get_user, user_registration
 from app.db.session import DBSync
 import asyncio
 

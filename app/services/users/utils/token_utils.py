@@ -1,22 +1,14 @@
 import datetime
 from datetime import timedelta
-from jose import JWTError, jwt
-from passlib.context import CryptContext
+
+from jose import jwt, JWTError
 from app.config import config
+
 
 SECRET_KEY = config.SECRET_KEY
 ALGORITHM = config.ALGORITHM
 ACCESS_TOKEN_EXPIRE_MINUTES = int(config.ACCESS_TOKEN_EXPIRE_MINUTES)
 REFRESH_TOKEN_EXPIRE_DAYS = int(config.REFRESH_TOKEN_EXPIRE_DAYS)
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-def hash_password(password):
-    return pwd_context.hash(password)
 
 
 def create_access_token(data: dict, expires_delta: timedelta = None):

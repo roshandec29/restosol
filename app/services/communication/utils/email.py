@@ -29,6 +29,7 @@ async def send_email(recipient: str, subject: str, message: str) -> bool:
         print(f"Email sending failed: {e}")
         return False
 
+
 def registration_email():
     email_body = """\
     Hey,
