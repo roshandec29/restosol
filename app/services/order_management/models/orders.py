@@ -1,18 +1,18 @@
 from datetime import datetime
 
 from sqlalchemy import Column, Integer, ForeignKey, String, Float, DateTime, UniqueConstraint
-from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy.orm import relationship
 
-Base = declarative_base()
+from app.db.models.base import Base
 
 
 class Order(Base):
     __tablename__ = 'orders'
     id = Column(Integer, primary_key=True, index=True)
     outlet_id = Column(Integer, ForeignKey('outlets.id'), nullable=False)
-    customer_name = Column(String, nullable=False)
-    customer_contact = Column(String, nullable=False)
-    status = Column(String, default="Pending")
+    customer_name = Column(String(255), nullable=False)
+    customer_contact = Column(String(255), nullable=False)
+    status = Column(String(255), default="Pending")
     total_amount = Column(Float, default=0.0)
     created_at = Column(DateTime, default=datetime.utcnow)
 

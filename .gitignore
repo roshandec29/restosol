@@ -1,6 +1,5 @@
 # Ignore virtual environment
 venv/
 .venv/
-migrations/
 .idea/*
 __pycache__/

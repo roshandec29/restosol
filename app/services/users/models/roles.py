@@ -3,7 +3,7 @@ from enum import Enum
 from typing import List
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-from app.services.users.models.base import Base
+from app.db.models.base import Base
 
 
 class RoleEnum(str, Enum):
@@ -74,7 +74,7 @@ class Role(Base):
 
 class RolePermission(Base):
     __tablename__ = 'role_permissions'
-
+    id = Column(Integer, primary_key=True)
     role_id = Column(Integer, ForeignKey('roles.id'))
     permission_id = Column(Integer, ForeignKey('permissions.id'))
 

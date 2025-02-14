@@ -2,7 +2,7 @@ from sqlalchemy import func, DateTime, Column, String, Integer, Boolean, Foreign
 from sqlalchemy.orm import relationship
 import enum
 
-from app.services.users.models.base import Base
+from app.db.models.base import Base
 
 
 class SubscriptionPlan(str, enum.Enum):
@@ -61,6 +61,8 @@ class Outlet(Base):
     integrations = relationship("TenantIntegration", back_populates="outlet")
     users = relationship('User', back_populates='outlet')
     user_roles = relationship('UserRole', back_populates='outlet')
+    orders = relationship('Order', back_populates='outlet')
+    menus = relationship('Menu', back_populates='outlet')
 
 
 
