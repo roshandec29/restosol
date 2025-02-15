@@ -13,12 +13,10 @@ from app.config import config
 SECRET_KEY=config.SECRET_KEY
 
 
-def create_app():
-    app = FastAPI()
-    app.include_router(user_router, prefix="/user", tags=["RestoSol"])
-    app.include_router(google_router, prefix="/google_auth", tags=["RestoSol"])
-    app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
-    return app
+app = FastAPI()
+app.include_router(user_router, prefix="/user", tags=["RestoSol"])
+app.include_router(google_router, prefix="/google_auth", tags=["RestoSol"])
+app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
 
 
 @app.get("/health")
@@ -42,4 +40,4 @@ async def send_email_api(email_data: EmailRequest):
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
-    uvicorn.run(create_app(), host="0.0.0.0", port=port)
+    uvicorn.run(app, host="0.0.0.0", port=port)
