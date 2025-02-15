@@ -2,6 +2,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from typing import List
+from app.config import config
 Base = declarative_base()
 
 
@@ -9,7 +10,7 @@ class DBSync:
     all_sessions: List[Session] = []
 
     def __init__(self):
-        DB_URL = "mysql+pymysql://root:root@localhost:3306/restosol"
+        DB_URL = config.DB_URL
         self.engine = create_engine(DB_URL)
         Base.metadata.create_all(bind=self.engine)
         self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
