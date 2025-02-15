@@ -5,13 +5,13 @@ from fastapi import APIRouter
 from app.api.v1.users import register_user, login
 from app.db.schema.user_schema import UserRegisterRequest
 from fastapi.security import OAuth2PasswordRequestForm
-
+from app.config import config
 router = APIRouter()
 
 # Google OAuth2 Configuration
-GOOGLE_CLIENT_ID = "186173492308-d7ugkh5keogai13k7i3v7srahnqs01ir.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET = "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"
-GOOGLE_REDIRECT_URI = "http://localhost:8000/google_auth/auth/google/callback"
+GOOGLE_CLIENT_ID = config.GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET = config.GOOGLE_CLIENT_SECRET
+GOOGLE_REDIRECT_URI = config.GOOGLE_REDIRECT_URI
 GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/auth"
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v1/userinfo"
@@ -72,7 +72,7 @@ async def google_callback(request: Request, code: str):
             new_user = UserRegisterRequest(**{
                           "username": user_info.get("email"),
                           "email": user_info.get("email"),
-                          "password": f"{user_info.get("email")}+!12&*^%$#",
+                          "password": f"{user_info.get('email')}+!12&*^%$#",
                           "name": user_info.get("name"),
                           "phone": None,
                           "tenant_id": tenant_id,
