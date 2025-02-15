@@ -1,7 +1,8 @@
 from fastapi import FastAPI, HTTPException
+import os
+import uvicorn
 
-from app.db.session import init_db
-from app.db.session import Base
+from app.db.session import Base, init_db
 from app.api.v1.users import router as user_router
 from app.api.v1.google_oauth import router as google_router
 from starlette.middleware.sessions import SessionMiddleware
@@ -11,11 +12,13 @@ from app.config import config
 
 SECRET_KEY=config.SECRET_KEY
 
-db = init_db(config.DB_URL)
-app = FastAPI()
-app.include_router(user_router, prefix="/user", tags=["RestoSol"])
-app.include_router(google_router, prefix="/google_auth", tags=["RestoSol"])
-app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
+
+def create_app():
+    app = FastAPI()
+    app.include_router(user_router, prefix="/user", tags=["RestoSol"])
+    app.include_router(google_router, prefix="/google_auth", tags=["RestoSol"])
+    app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
+    return app
 
 
 @app.get("/health")
@@ -25,7 +28,7 @@ async def health():
 
 @app.on_event("startup")
 def startup():
-    Base.metadata.create_all(bind=db.engine)
+    Base.metadata.create_all(bind=init_db(config.DB_URL).engine)
 
 
 @app.post("/send-email/")
@@ -36,3 +39,7 @@ async def send_email_api(email_data: EmailRequest):
         raise HTTPException(status_code=500, detail="Failed to send email")
 
     return {"message": "Email sent successfully"}
+
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(create_app(), host="0.0.0.0", port=port)
