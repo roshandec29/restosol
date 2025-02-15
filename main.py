@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
-
+import os
+import uvicorn
 from app.db.session import DBSync
 from app.db.session import Base
 from app.api.v1.users import router as user_router
@@ -36,3 +37,7 @@ async def send_email_api(email_data: EmailRequest):
         raise HTTPException(status_code=500, detail="Failed to send email")
 
     return {"message": "Email sent successfully"}
+
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
