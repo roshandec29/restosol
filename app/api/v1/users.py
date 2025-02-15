@@ -71,7 +71,6 @@ async def read_users_me(username: str):
         name=current_user.name,
         phone=current_user.phone,
         date_of_birth=current_user.date_of_birth,
-        is_active=current_user.is_active,
         phone_verified=current_user.phone_verified,
         email_verified=current_user.email_verified,
         last_login=current_user.last_login,

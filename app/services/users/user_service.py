@@ -16,7 +16,10 @@ def get_user(db: Session, username: str) -> User | None:
     """
     Fetch a user from the database by username.
     """
-    result = db.query(User).filter(User.username == username).first()
+    result = db.query(User).filter(
+        User.username == username,
+        User.is_active == True
+    ).first()
 
     return result if result else None
 
