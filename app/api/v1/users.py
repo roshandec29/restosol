@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.orm import Session
+
 from app.services.users.utils.token_utils import create_access_token, create_refresh_token, decode_token
 from app.services.communication.utils.email import send_email, registration_email
 from app.db.schema.user_schema import Token, UserResponse, UserRegisterRequest
-from app.services.users.user_service import authenticate_user, get_user, user_registration
-from app.db.session import DBSync
+from app.services.users.user_service import authenticate_user, get_user, user_registration, UserService
+from app.db.session import DBSync, DBManager, get_db
 import asyncio
 
 router = APIRouter()
@@ -55,9 +57,9 @@ def refresh_token(refresh_token: str):
 
 
 @router.get("/get_user", response_model=UserResponse)
-async def read_users_me(username: str):
-    session = DBSync().get_new_session()
-    current_user = get_user(session, username)
+async def read_users_me(username: str, db: Session = Depends(get_db)):
+    user_service_obj = UserService(db)
+    current_user = user_service_obj.get_user(username)
     if not current_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

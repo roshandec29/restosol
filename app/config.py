@@ -1,4 +1,6 @@
 import os
+from urllib.parse import quote_plus
+
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -16,6 +18,6 @@ class Config:
     GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
     GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
     GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
-    DB_URL = os.getenv("DB_URL")
+    DB_URL = f'mysql+pymysql://{os.getenv("DB_USERNAME")}:{quote_plus(os.getenv("DB_PASSWORD"))}@{os.getenv("DB_HOST")}:{os.getenv("BD_PORT")}/restosol'
 
 config = Config()

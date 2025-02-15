@@ -1,7 +1,11 @@
+from contextlib import contextmanager
+from functools import lru_cache
+
+from fastapi import Depends
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
-from typing import List
+from typing import List, Generator
 from app.config import config
 Base = declarative_base()
 
@@ -41,3 +45,34 @@ class DBSync:
             used_session.close()
         except Exception as e:
             print(f"Error while closing session: {e}")
+
+
+class DBManager:
+    def __init__(self, db_url: str):
+        self.engine = create_engine(db_url)
+        Base.metadata.create_all(bind=self.engine)
+        self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
+        self._sessionmaker = None
+
+    @contextmanager
+    def session(self) -> Generator[Session, None, None]:
+        db = self.SessionLocal()
+        try:
+            yield db
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            raise
+        finally:
+            db.close()
+
+
+@lru_cache
+def init_db(db_url: str = config.DB_URL):
+    return DBManager(db_url)
+
+
+def get_db() -> Session:
+    db_manager = init_db()
+    with db_manager.session() as db:
+        yield db

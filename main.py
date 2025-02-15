@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 
-from app.db.session import DBSync
+from app.db.session import init_db
 from app.db.session import Base
 from app.api.v1.users import router as user_router
 from app.api.v1.google_oauth import router as google_router
@@ -11,7 +11,7 @@ from app.config import config
 
 SECRET_KEY=config.SECRET_KEY
 
-db = DBSync()
+db = init_db(config.DB_URL)
 app = FastAPI()
 app.include_router(user_router, prefix="/user", tags=["RestoSol"])
 app.include_router(google_router, prefix="/google_auth", tags=["RestoSol"])

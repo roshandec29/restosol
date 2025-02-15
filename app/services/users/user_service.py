@@ -6,10 +6,26 @@ from app.services.users.utils.password_utils import verify_password, hash_passwo
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from app.db.schema.user_schema import UserResponse
-from app.db.session import DBSync
+from app.db.session import DBSync, DBManager
 from app.services.users.models.tenant import Tenant, Outlet
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
+class UserService:
+    def __init__(self, db: Session):
+        self.db = db
+
+    def get_user(self, username: str) -> User | None:
+        """
+        Fetch a user from the database by username.
+        """
+        result = self.db.query(User).filter(
+            User.username == username,
+            User.is_active == True
+        ).first()
+
+        return result
 
 
 def get_user(db: Session, username: str) -> User | None:
