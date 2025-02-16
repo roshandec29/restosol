@@ -9,6 +9,9 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.db.schema.email import EmailRequest
 from app.services.communication.utils.email import send_email
 from app.config import config
+from app.core.startup import seed_permissions_and_roles
+
+app = FastAPI()
 
 SECRET_KEY=config.SECRET_KEY
 
@@ -27,6 +30,8 @@ async def health():
 @app.on_event("startup")
 def startup():
     Base.metadata.create_all(bind=init_db(config.DB_URL).engine)
+    seed_permissions_and_roles()
+
 
 
 @app.post("/send-email/")
