@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, ForeignKey, String, Float, DateTime, UniqueConstraint
+from sqlalchemy import Column, Integer, ForeignKey, String, Float, DateTime, UniqueConstraint, func
 from sqlalchemy.orm import relationship
 
 from app.db.models.base import Base
@@ -14,7 +14,8 @@ class Order(Base):
     customer_contact = Column(String(255), nullable=False)
     status = Column(String(255), default="Pending")
     total_amount = Column(Float, default=0.0)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
     outlet = relationship("Outlet", back_populates="orders")
     order_items = relationship("OrderItem", back_populates="order")
@@ -28,7 +29,8 @@ class OrderItem(Base):
     outlet_id = Column(Integer, ForeignKey('outlets.id'), nullable=False)
     quantity = Column(Integer, nullable=False)
     price = Column(Float, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
     order = relationship("Order", back_populates="order_items")
     menu = relationship("Menu", back_populates="order_items")

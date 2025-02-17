@@ -1,6 +1,41 @@
 from app.db.session import DBSync
 from app.db.models import Permission, Role, Tenant, Outlet
 from datetime import datetime
+import os
+from alembic import command
+from alembic.config import Config
+from app.config import config
+import subprocess
+
+def runc_migrations():
+    alembic_ini_path = os.path.join(os.path.dirname(__file__), '../../alembic.ini')
+
+    alembic_cfg = Config(alembic_ini_path)
+    alembic_cfg.set_main_option("script_location", "alembic")
+
+    print("🔄 Running database migrations...")
+
+    command.upgrade(alembic_cfg, "head")
+    print("✅ Database migrations completed.")
+
+
+def run_migrations():
+    """Automatically apply Alembic migrations in production."""
+    try:
+        env = os.environ.copy()
+        env["DATABASE_URL"] = config.DB_URL
+        subprocess.run(["alembic", "upgrade", "head"], check=True, env=env)
+        print("Migrations applied successfully.")
+    except Exception as e:
+        print(f"Error running migrations: {e}")
+
+def seed_data():
+    run_migrations()
+    try:
+        seed_permissions_and_roles()
+        print("Seeding completed successfully.")
+    finally:
+        pass
 
 def seed_permissions_and_roles():
     db= DBSync()
