@@ -49,7 +49,7 @@ def seed_permissions_and_roles():
             contact_email='john.doe@restosol.com',
             contact_phone='+1234567890',
             billing_address='123 Main St, NY, USA',
-            subscription_plan='ENTERPRISE',
+            subscription_plan='enterprise',
             is_active=True,
             created_at=datetime.now(),
             updated_at=datetime.now()
