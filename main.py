@@ -29,8 +29,8 @@ async def health():
 
 @app.on_event("startup")
 def startup():
-    # Base.metadata.create_all(bind=init_db(config.DB_URL).engine)
-    # seed_data()
+    Base.metadata.create_all(bind=init_db(config.DB_URL).engine)
+    seed_data()
     pass
 
 
