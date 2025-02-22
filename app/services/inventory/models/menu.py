@@ -24,3 +24,18 @@ class Item(Base):
 
     category = relationship("Category", back_populates="items")
     order_items = relationship("OrderItem", back_populates="item")
+
+
+class Category(Base):
+    __tablename__ = 'categories'
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(255), nullable=False, unique=True)
+    description = Column(String(500), nullable=True)
+    parent_id = Column(Integer, ForeignKey('categories.id'), nullable=True)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+
+    parent_category = relationship("Category", remote_side=[id], back_populates="subcategories")
+    subcategories = relationship("Category", back_populates="parent_category")
+    items = relationship("Item", back_populates="category")

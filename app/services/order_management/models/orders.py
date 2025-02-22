@@ -22,7 +22,7 @@ class Order(Base):
     tax = Column(Float, default=0.0)
     currency = Column(String(10), default="USD")
     notes = Column(String(500), nullable=True)
-    metadata = Column(JSON, nullable=True)
+    order_metadata = Column(JSON, nullable=True)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
@@ -44,7 +44,7 @@ class OrderItem(Base):
     total_price = Column(Float, nullable=False)
     discount = Column(Float, default=0.0)
     tax = Column(Float, default=0.0)
-    metadata = Column(JSON, nullable=True)  # Store additional attributes
+    order_metadata = Column(JSON, nullable=True)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
