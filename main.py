@@ -5,6 +5,8 @@ import uvicorn
 from app.db.session import Base, init_db
 from app.api.v1.users import router as user_router
 from app.api.v1.google_oauth import router as google_router
+from app.api.v1.inventory import router as inventory_router
+from app.api.v1.menu import router as menu_router
 from starlette.middleware.sessions import SessionMiddleware
 from app.db.schema.email import EmailRequest
 from app.services.communication.utils.email import send_email
@@ -19,6 +21,8 @@ SECRET_KEY=config.SECRET_KEY
 app = FastAPI()
 app.include_router(user_router, prefix="/user", tags=["RestoSol"])
 app.include_router(google_router, prefix="/google_auth", tags=["RestoSol"])
+app.include_router(menu_router, prefix="/menu", tags=["RestoSol"])
+app.include_router(inventory_router, prefix="/inventory", tags=["RestoSol"])
 app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
 
 

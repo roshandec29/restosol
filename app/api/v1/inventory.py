@@ -1,52 +1,25 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from typing import List
-from app.db.session import DBSync
-from app.services.inventory.schema import CategoryResponse, ItemResponse, ItemCreate, CategoryCreate
-from app.services.inventory.inventory_service import CategoryService, ItemService
-
+from app.services.inventory.schema import StockCreate, PurchaseOrderCreate, SupplierCreate, PurchaseOrderItemCreate
+from app.services.inventory.inventory_service import create_stock, create_purchase_order, create_supplier, create_purchase_order_item
 
 router = APIRouter()
 
 def get_session():
     return DBSync().get_new_session()
 
+@router.post("/stock/")
+def add_stock(stock_data: StockCreate, db: Session = Depends(get_session)):
+    return create_stock(db, stock_data)
 
+@router.post("/purchase_order/")
+def add_purchase_order(order_data: PurchaseOrderCreate, db: Session = Depends(get_session)):
+    return create_purchase_order(db, order_data)
 
-# Routes
-@router.post("/categories/", response_model=CategoryResponse)
-def create_category(category: CategoryCreate, session: Session = Depends(get_session)):
-    return CategoryService(session).create_category(category)
+@router.post("/supplier/")
+def add_supplier(supplier_data: SupplierCreate, db: Session = Depends(get_session)):
+    return create_supplier(db, supplier_data)
 
-@router.get("/categories/", response_model=List[CategoryResponse])
-def get_categories(session: Session = Depends(get_session)):
-    return CategoryService(session).get_categories()
-
-@router.get("/categories/{category_id}", response_model=CategoryResponse)
-def get_category(category_id: int, session: Session = Depends(get_session)):
-    return CategoryService(session).get_category(category_id)
-
-
-@router.delete("/categories/{category_id}")
-def delete_category(category_id: int, session: Session = Depends(get_session)):
-    return CategoryService(session).delete_category(category_id)
-
-
-@router.post("/items/", response_model=ItemResponse)
-def create_item(item: ItemCreate, session: Session = Depends(get_session)):
-    return ItemService(session).create_item(item)
-
-
-@router.get("/items/", response_model=List[ItemResponse])
-def get_items(session: Session = Depends(get_session)):
-    return ItemService(session).get_items()
-
-
-@router.get("/items/{item_id}", response_model=ItemResponse)
-def get_item(item_id: int, session: Session = Depends(get_session)):
-    return ItemService(session).get_item(item_id)
-
-
-@router.delete("/items/{item_id}")
-def delete_item(item_id: int, session: Session = Depends(get_session)):
-    return ItemService(session).delete_item(item_id)
+@router.post("/purchase_order_item/")
+def add_purchase_order_item(item_data: PurchaseOrderItemCreate, db: Session = Depends(get_session)):
+    return create_purchase_order_item(db, item_data)

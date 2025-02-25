@@ -1,44 +1,61 @@
-from typing import List, Optional
 from pydantic import BaseModel
+from typing import Optional, List
+from datetime import datetime
 
+class StockBase(BaseModel):
+    item_id: int
+    quantity: int
+    min_threshold: Optional[int] = 5
 
-class CategoryBase(BaseModel):
-    name: str
-    description: Optional[str] = None
-    parent_id: Optional[int] = None
-
-
-class CategoryCreate(CategoryBase):
+class StockCreate(StockBase):
     pass
 
-
-class CategoryResponse(CategoryBase):
+class StockResponse(StockBase):
     id: int
+    last_updated: datetime
 
     class Config:
         from_attributes = True
 
+class PurchaseOrderBase(BaseModel):
+    supplier_id: int
+    status: Optional[str] = "Pending"
+    total_cost: float
 
-class ItemBase(BaseModel):
-    name: str
-    description: Optional[str] = None
-    price: float
-    currency: Optional[str] = "USD"
-    category_id: int
-    type: str
-    is_available: Optional[bool] = True
-    stock_quantity: Optional[int] = 0
-    unit: Optional[str] = None
-    discount: Optional[float] = 0.0
-    tax_rate: Optional[float] = 0.0
-    attributes: Optional[dict] = None
-
-
-class ItemCreate(ItemBase):
+class PurchaseOrderCreate(PurchaseOrderBase):
     pass
 
+class PurchaseOrderResponse(PurchaseOrderBase):
+    id: int
+    order_date: datetime
 
-class ItemResponse(ItemBase):
+    class Config:
+        from_attributes = True
+
+class SupplierBase(BaseModel):
+    name: str
+    contact_info: Optional[dict] = None
+
+class SupplierCreate(SupplierBase):
+    pass
+
+class SupplierResponse(SupplierBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class PurchaseOrderItemBase(BaseModel):
+    purchase_order_id: int
+    item_id: int
+    quantity: int
+    unit_price: float
+
+class PurchaseOrderItemCreate(PurchaseOrderItemBase):
+    pass
+
+class PurchaseOrderItemResponse(PurchaseOrderItemBase):
     id: int
 
     class Config:

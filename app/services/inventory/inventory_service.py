@@ -1,58 +1,35 @@
 from sqlalchemy.orm import Session
-from fastapi import HTTPException
-from app.services.inventory.models.menu import Item, Category
-from app.services.inventory.schema import CategoryResponse, ItemResponse, ItemCreate, CategoryCreate
+from app.services.inventory.models.inventory import Stock, PurchaseOrder, Supplier, PurchaseOrderItem
+from app.services.inventory.schema import StockCreate, PurchaseOrderCreate, SupplierCreate, PurchaseOrderItemCreate
 
 
-class CategoryService:
-    def __init__(self, session: Session):
-        self.session = session
-
-    def create_category(self, category_data: CategoryCreate):
-        category = Category(**category_data.model_dump())
-        self.session.add(category)
-        self.session.commit()
-        self.session.refresh(category)
-        return category
-
-    def get_categories(self):
-        return self.session.query(Category).all()
-
-    def get_category(self, category_id: int):
-        category = self.session.query(Category).filter(Category.id == category_id).first()
-        if not category:
-            raise HTTPException(status_code=404, detail="Category not found")
-        return category
-
-    def delete_category(self, category_id: int):
-        category = self.get_category(category_id)
-        self.session.delete(category)
-        self.session.commit()
-        return {"message": "Category deleted successfully"}
+def create_stock(db: Session, stock_data: StockCreate):
+    new_stock = Stock(**stock_data.model_dump())
+    db.add(new_stock)
+    db.commit()
+    db.refresh(new_stock)
+    return new_stock
 
 
-class ItemService:
-    def __init__(self, session: Session):
-        self.session = session
+def create_purchase_order(db: Session, order_data: PurchaseOrderCreate):
+    new_order = PurchaseOrder(**order_data.model_dump())
+    db.add(new_order)
+    db.commit()
+    db.refresh(new_order)
+    return new_order
 
-    def create_item(self, item_data: ItemCreate):
-        item = Item(**item_data.model_dump())
-        self.session.add(item)
-        self.session.commit()
-        self.session.refresh(item)
-        return item
 
-    def get_items(self):
-        return self.session.query(Item).all()
+def create_supplier(db: Session, supplier_data: SupplierCreate):
+    new_supplier = Supplier(**supplier_data.model_dump())
+    db.add(new_supplier)
+    db.commit()
+    db.refresh(new_supplier)
+    return new_supplier
 
-    def get_item(self, item_id: int):
-        item = self.session.query(Item).filter(Item.id == item_id).first()
-        if not item:
-            raise HTTPException(status_code=404, detail="Item not found")
-        return item
 
-    def delete_item(self, item_id: int):
-        item = self.get_item(item_id)
-        self.session.delete(item)
-        self.session.commit()
-        return {"message": "Item deleted successfully"}
+def create_purchase_order_item(db: Session, item_data: PurchaseOrderItemCreate):
+    new_item = PurchaseOrderItem(**item_data.model_dump())
+    db.add(new_item)
+    db.commit()
+    db.refresh(new_item)
+    return new_item
