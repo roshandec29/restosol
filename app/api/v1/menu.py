@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import List
 from app.db.session import DBSync
-from app.services.inventory.schema import CategoryResponse, ItemResponse, ItemCreate, CategoryCreate
+from app.services.menu_management.schema import CategoryResponse, ItemResponse, ItemCreate, CategoryCreate
 from app.services.menu_management.menu_service import CategoryService, ItemService
 
 

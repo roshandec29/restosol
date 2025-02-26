@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from app.services.inventory.models.menu import Item, Category
-from app.services.inventory.schema import CategoryResponse, ItemResponse, ItemCreate, CategoryCreate
+from app.services.menu_management.models.menu import Item, Category
+from app.services.menu_management.schema import CategoryResponse, ItemResponse, ItemCreate, CategoryCreate
 
 
 class CategoryService:

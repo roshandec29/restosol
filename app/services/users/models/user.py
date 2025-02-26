@@ -29,6 +29,7 @@ class User(Base):
     roles = relationship('UserRole', back_populates='user')
     global_admin = relationship('GlobalAdmin', uselist=False, back_populates='user')
     address = relationship('Address', back_populates='user', cascade='all, delete-orphan')
+    orders = relationship('Order', back_populates='users')
 
     def as_dict(self):
         return {column.name: getattr(self, column.name) for column in self.__table__.columns}

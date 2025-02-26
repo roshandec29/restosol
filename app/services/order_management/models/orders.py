@@ -27,7 +27,7 @@ class Order(Base):
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
-    user = relationship("User", back_populates="orders")
+    users = relationship("User", back_populates="orders")
     outlet = relationship("Outlet", back_populates="orders")
     order_items = relationship("OrderItem", back_populates="order")
 
