@@ -38,7 +38,7 @@ class UserResponse(UserBase):
     created_at: Optional[datetime] = None
 
     class Config:
-        orm_mode = True
+        from_attributes= True
 
 
 class UserRegisterRequest(BaseModel):
@@ -71,7 +71,7 @@ class GlobalAdminResponse(GlobalAdminBase):
     created_at: Optional[datetime] = None
 
     class Config:
-        orm_mode = True
+        from_attributes= True
 
 
 # UserRole-related schemas
@@ -91,7 +91,7 @@ class UserRoleResponse(UserRoleBase):
     created_at: Optional[datetime] = None
 
     class Config:
-        orm_mode = True
+        from_attributes= True
 
 
 # Address-related schemas
@@ -114,4 +114,4 @@ class AddressResponse(AddressBase):
     created_at: Optional[datetime] = None
 
     class Config:
-        orm_mode = True
+        from_attributes= True

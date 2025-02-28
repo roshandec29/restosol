@@ -12,8 +12,16 @@ from app.db.schema.email import EmailRequest
 from app.services.communication.utils.email import send_email
 from app.config import config
 from app.core.startup import seed_data
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    Base.metadata.create_all(bind=init_db(config.DB_URL).engine)
+    seed_data()
+
+
+app = FastAPI(lifespan=lifespan)
 
 SECRET_KEY=config.SECRET_KEY
 
@@ -29,14 +37,6 @@ app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
 @app.get("/health")
 async def health():
     return {"status": 200, "message": "healthy"}
-
-
-@app.on_event("startup")
-def startup():
-    Base.metadata.create_all(bind=init_db(config.DB_URL).engine)
-    seed_data()
-    pass
-
 
 
 @app.post("/send-email/")
