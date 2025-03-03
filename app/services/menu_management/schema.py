@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, condecimal
 
 
 class CategoryBase(BaseModel):
@@ -43,3 +43,33 @@ class ItemResponse(ItemBase):
 
     class Config:
         from_attributes = True
+
+
+class MenuBase(BaseModel):
+    name: str
+    description: Optional[str] = None
+    is_active: bool = True
+    outlet_id: int
+
+
+class MenuCreate(MenuBase):
+    pass
+
+
+class MenuUpdate(MenuBase):
+    pass
+
+
+class MenuItemBase(BaseModel):
+    menu_id: int
+    item_id: int
+    is_available: bool = True
+    price_override: Optional[condecimal(max_digits=10, decimal_places=2)] = None
+
+
+class MenuItemCreate(MenuItemBase):
+    pass
+
+
+class MenuItemUpdate(MenuItemBase):
+    pass

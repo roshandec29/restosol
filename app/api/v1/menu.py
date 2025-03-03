@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import List
 from app.db.session import DBSync
-from app.services.menu_management.schema import CategoryResponse, ItemResponse, ItemCreate, CategoryCreate
-from app.services.menu_management.menu_service import CategoryService, ItemService
+from app.services.menu_management.schema import CategoryResponse, ItemResponse, ItemCreate, CategoryCreate, MenuCreate, \
+    MenuUpdate, MenuItemCreate, MenuItemUpdate
+from app.services.menu_management.menu_service import CategoryService, ItemService, MenuService
 
 
 router = APIRouter()
@@ -48,3 +49,36 @@ def get_item(item_id: int, session: Session = Depends(get_session)):
 @router.delete("/items/{item_id}")
 def delete_item(item_id: int, session: Session = Depends(get_session)):
     return ItemService(session).delete_item(item_id)
+
+
+@router.post("/menus/")
+def create_menu(menu: MenuCreate, db: Session = Depends(get_session)):
+    return MenuService.create_menu(db, menu)
+
+@router.get("/menus/{menu_id}")
+def get_menu(menu_id: int, db: Session = Depends(get_session)):
+    return MenuService.get_menu(db, menu_id)
+
+@router.put("/menus/{menu_id}")
+def update_menu(menu_id: int, menu: MenuUpdate, db: Session = Depends(get_session)):
+    return MenuService.update_menu(db, menu_id, menu)
+
+@router.delete("/menus/{menu_id}")
+def delete_menu(menu_id: int, db: Session = Depends(get_session)):
+    return MenuService.delete_menu(db, menu_id)
+
+@router.post("/menu-items/")
+def create_menu_item(menu_item: MenuItemCreate, db: Session = Depends(get_session)):
+    return MenuService.create_menu_item(db, menu_item)
+
+@router.get("/menu-items/{menu_item_id}")
+def get_menu_item(menu_item_id: int, db: Session = Depends(get_session)):
+    return MenuService.get_menu_item(db, menu_item_id)
+
+@router.put("/menu-items/{menu_item_id}")
+def update_menu_item(menu_item_id: int, menu_item: MenuItemUpdate, db: Session = Depends(get_session)):
+    return MenuService.update_menu_item(db, menu_item_id, menu_item)
+
+@router.delete("/menu-items/{menu_item_id}")
+def delete_menu_item(menu_item_id: int, db: Session = Depends(get_session)):
+    return MenuService.delete_menu_item(db, menu_item_id)
