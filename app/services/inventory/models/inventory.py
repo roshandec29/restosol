@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, ForeignKey, String, Float, Boolean, Date
 from sqlalchemy.orm import relationship
 from app.db.models.base import Base
 
+
 class StockItem(Base):
     """ Represents an item that can be stocked and sold. """
     __tablename__ = 'stock_items'
@@ -108,3 +109,31 @@ class Expense(Base):
     description = Column(String(255), nullable=False)
     amount = Column(Float, nullable=False)
     expense_date = Column(DateTime, server_default=func.now(), nullable=False)
+
+
+class SaleTransaction(Base):
+    """ Tracks sales transactions for stock items. """
+    __tablename__ = 'sales_transactions'
+
+    id = Column(Integer, primary_key=True, index=True)
+    item_id = Column(Integer, ForeignKey('stock_items.id'), nullable=False)
+    quantity = Column(Integer, nullable=False)
+    total_price = Column(Float, nullable=False)  # Quantity * Selling Price
+    sale_date = Column(DateTime, server_default=func.now(), nullable=False)
+    payment_method = Column(Enum("Cash", "Card", "UPI", "Bank Transfer", name="payment_method"), nullable=False)
+
+    stock_item = relationship("StockItem", backref="sales")
+
+
+class StockAudit(Base):
+    """ Logs stock audits for tracking discrepancies. """
+    __tablename__ = 'stock_audits'
+
+    id = Column(Integer, primary_key=True, index=True)
+    item_id = Column(Integer, ForeignKey('stock_items.id'), nullable=False)
+    expected_quantity = Column(Integer, nullable=False)
+    actual_quantity = Column(Integer, nullable=False)
+    audit_date = Column(DateTime, server_default=func.now(), nullable=False)
+    remarks = Column(String(255), nullable=True)
+
+    stock_item = relationship("StockItem", backref="audits")

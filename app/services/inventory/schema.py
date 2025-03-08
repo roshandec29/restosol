@@ -1,62 +1,99 @@
 from pydantic import BaseModel
-from typing import Optional, List
 from datetime import datetime
+from typing import List, Optional
 
-class StockBase(BaseModel):
+
+# Stock Schemas
+class StockCreate(BaseModel):
     item_id: int
     quantity: int
-    min_threshold: Optional[int] = 5
 
-class StockCreate(StockBase):
-    pass
 
-class StockResponse(StockBase):
+class StockResponse(BaseModel):
     id: int
+    item_id: int
+    quantity: int
+    min_threshold: int
     last_updated: datetime
 
-    class Config:
-        from_attributes = True
 
-class PurchaseOrderBase(BaseModel):
-    supplier_id: int
-    status: Optional[str] = "Pending"
-    total_cost: float
+# Stock Movement Schemas
+class StockMovementCreate(BaseModel):
+    item_id: int
+    quantity: int
+    movement_type: str
+    remarks: Optional[str] = None
 
-class PurchaseOrderCreate(PurchaseOrderBase):
-    pass
 
-class PurchaseOrderResponse(PurchaseOrderBase):
+class StockMovementResponse(StockMovementCreate):
     id: int
-    order_date: datetime
+    movement_date: datetime
 
-    class Config:
-        from_attributes = True
 
-class SupplierBase(BaseModel):
+# Supplier Schemas
+class SupplierCreate(BaseModel):
     name: str
-    contact_info: Optional[dict] = None
+    contact_info: dict
 
-class SupplierCreate(SupplierBase):
-    pass
 
-class SupplierResponse(SupplierBase):
+class SupplierResponse(SupplierCreate):
     id: int
     created_at: datetime
 
-    class Config:
-        from_attributes = True
 
-class PurchaseOrderItemBase(BaseModel):
-    purchase_order_id: int
+# Purchase Order Schemas
+class PurchaseOrderItemCreate(BaseModel):
     item_id: int
     quantity: int
     unit_price: float
 
-class PurchaseOrderItemCreate(PurchaseOrderItemBase):
-    pass
 
-class PurchaseOrderItemResponse(PurchaseOrderItemBase):
+class PurchaseOrderCreate(BaseModel):
+    supplier_id: int
+    items: List[PurchaseOrderItemCreate]
+
+
+class PurchaseOrderResponse(BaseModel):
     id: int
+    supplier_id: int
+    order_date: datetime
+    status: str
+    total_cost: float
+    items: List[PurchaseOrderItemCreate]
 
-    class Config:
-        from_attributes = True
+
+# Purchase Transaction Schemas
+class PurchaseTransactionCreate(BaseModel):
+    purchase_order_id: int
+    amount_paid: float
+    payment_method: str
+
+
+class PurchaseTransactionResponse(PurchaseTransactionCreate):
+    id: int
+    payment_date: datetime
+
+
+# Sale Transaction Schemas
+class SaleTransactionCreate(BaseModel):
+    item_id: int
+    quantity: int
+    payment_method: str
+
+
+class SaleTransactionResponse(SaleTransactionCreate):
+    id: int
+    total_price: float
+    sale_date: datetime
+
+
+# Expense Schemas
+class ExpenseCreate(BaseModel):
+    expense_type: str
+    description: str
+    amount: float
+
+
+class ExpenseResponse(ExpenseCreate):
+    id: int
+    expense_date: datetime
