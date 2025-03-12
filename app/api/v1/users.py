@@ -4,11 +4,11 @@ from sqlalchemy.orm import Session
 
 from app.services.users.utils.token_utils import create_access_token, create_refresh_token, decode_token
 from app.services.communication.utils.email import send_email, registration_email
-from app.db.schema.user_schema import Token, UserResponse, UserRegisterRequest
+from app.db.schema.user_schema import Token, UserResponse, UserRegisterRequest, UserResponseWithToken
 from app.services.users.user_service import authenticate_user, get_user, user_registration, UserService
 from app.db.session import DBSync, DBManager, get_db
 import asyncio
-
+from typing import Union
 router = APIRouter()
 
 
@@ -81,7 +81,7 @@ async def read_users_me(username: str, db: Session = Depends(get_db)):
     )
 
 
-@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/register", response_model=UserResponseWithToken, status_code=status.HTTP_201_CREATED)
 def register_user(user: UserRegisterRequest):
     db = DBSync()
     session = db.get_new_session()
@@ -102,8 +102,17 @@ def register_user(user: UserRegisterRequest):
         }
         access_token = create_access_token(data=user_data)
         refresh_token = create_refresh_token(user_data)
-
-        asyncio.create_task(send_email(response.email, "Registration Successful!", registration_email()))
-        return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
+        try:
+            loop = asyncio.get_running_loop()  # Safe inside async functions
+        except RuntimeError:
+            loop = asyncio.new_event_loop()  # Create a new loop if necessary
+            asyncio.set_event_loop(loop)
+        loop.create_task(send_email(response.email, "Registration Successful!", registration_email()))
+        return user_data | {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
     return response
+
+@router.delete("/users/{user_id}")
+def delete_menu(user_id: int):
+    db = DBSync().get_new_session()
+    return UserService(db).delete_user(user_id)

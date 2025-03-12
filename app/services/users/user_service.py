@@ -27,6 +27,16 @@ class UserService:
 
         return result
 
+    def delete_user(self, user_id: int):
+        user = self.db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        self.db.query(UserRole).filter(UserRole.user_id == user_id).delete(synchronize_session=False)
+
+        self.db.delete(user)
+        self.db.commit()
+        return {"message": "User deleted"}
+
 
 def get_user(db: Session, username: str) -> User | None:
     """
@@ -193,3 +203,5 @@ def user_registration(user, session, db):
     db.close_session(session)
 
     return response
+
+
