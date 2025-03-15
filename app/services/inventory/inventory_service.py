@@ -1,11 +1,9 @@
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
 from app.services.inventory.models.inventory import (
     Stock, PurchaseOrder, Supplier, PurchaseOrderItem, SaleTransaction, StockMovement, Expense
 )
 from app.services.inventory.schema import (
-    StockCreate, StockMovementCreate,
-    PurchaseOrderCreate, SupplierCreate, PurchaseOrderItemCreate, PurchaseTransactionCreate
+    StockCreate, PurchaseTransactionCreate
 )
 
 
