@@ -4,12 +4,19 @@ from sqlalchemy.orm import Session
 
 from app.services.users.utils.token_utils import create_access_token, create_refresh_token, decode_token
 from app.services.communication.utils.email import send_email, registration_email
-from app.db.schema.user_schema import Token, UserResponse, UserRegisterRequest, UserResponseWithToken
-from app.services.users.user_service import authenticate_user, get_user, user_registration, UserService
+from app.db.schema.user_schema import Token, UserResponse, UserRegisterRequest, UserResponseWithToken, OTPRequest
+from app.services.users.user_service import authenticate_user, get_user, user_registration, UserService, user_otp_generate
 from app.db.session import DBSync, DBManager, get_db
 import asyncio
-from typing import Union
 router = APIRouter()
+
+
+@router.post("/auth/request-otp")
+async def request_otp(data: OTPRequest):
+    session = DBSync().get_new_session()
+    otp = user_otp_generate(session, data)
+
+    return {"message": f"OTP sent successfully. {otp}"}
 
 
 @router.post("/token", response_model=Token)

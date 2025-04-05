@@ -10,7 +10,7 @@ class SMSUtils:
             phone_number: str,
             message: str,
             provider: Literal["fast2sms", "smshorizon", "textlocal", "exotel"],
-            api_key: str,
+            api_key: str = None,
             sender_id: Optional[str] = None,
             sid: Optional[str] = None,
             token: Optional[str] = None,
@@ -31,14 +31,18 @@ class SMSUtils:
         if provider == "fast2sms":
             url = "https://www.fast2sms.com/dev/bulkV2"
             payload = {
-                "authorization": "td7Ywhi2FgMokNjxRA0IPzKVZC3fen4Uv8SuL9brEXslQmq1WBSLJqpsWnD4eNvGclI0UyFXgwu98zQh",
                 "message": message,
                 "language": "english",
-                "route": "q",  # 'q' for transactional, 'p' for promotional
+                "route": "q",
                 "numbers": phone_number,
             }
-            headers = {"cache-control": "no-cache"}
+            headers = {
+                "authorization": "td7Ywhi2FgMokNjxRA0IPzKVZC3fen4Uv8SuL9brEXslQmq1WBSLJqpsWnD4eNvGclI0UyFXgwu98zQh",
+                "cache-control": "no-cache"
+            }
+
             response = requests.post(url, data=payload, headers=headers)
+            print(response.json())
             return response.json()
 
         elif provider == "smshorizon":
@@ -72,8 +76,7 @@ class SMSUtils:
         else:
             raise ValueError("Invalid provider. Choose from 'fast2sms', 'smshorizon', 'textlocal', 'exotel'.")
 
-    @staticmethod
-    def generate_otp(db: Session, phone_number: str) -> str:
+    def generate_otp(self, db: Session, phone_number: str) -> str:
         """
         Generates a 6-digit OTP, stores it in the database, and replaces any existing OTP.
         """
@@ -86,6 +89,8 @@ class SMSUtils:
         otp_entry = OTPModel(phone_number=phone_number, otp=otp)
         db.add(otp_entry)
         db.commit()
+
+        self.send_sms(phone_number=phone_number,message=f"Your otp is {otp}", provider="fast2sms")
 
         return otp
 

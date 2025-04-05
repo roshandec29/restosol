@@ -8,6 +8,7 @@ from fastapi.security import OAuth2PasswordBearer
 from app.db.schema.user_schema import UserResponse
 from app.db.session import DBSync, DBManager
 from app.services.users.models.tenant import Tenant, Outlet
+from app.utils.sms_utils import SMSUtils
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -203,5 +204,17 @@ def user_registration(user, session, db):
     db.close_session(session)
 
     return response
+
+
+def user_otp_generate(session, data):
+    user = session.query(User).filter(User.phone == data.phone).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User with this phone not found.")
+
+    otp = SMSUtils().generate_otp(session, data.phone)
+
+    return otp
+
 
 

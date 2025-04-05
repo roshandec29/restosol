@@ -119,3 +119,6 @@ class AddressResponse(AddressBase):
 
 class UserResponseWithToken(UserResponse, Token):
     pass
+
+class OTPRequest(BaseModel):
+    phone: str
