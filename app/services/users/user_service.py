@@ -9,6 +9,8 @@ from app.db.schema.user_schema import UserResponse
 from app.db.session import DBSync, DBManager
 from app.services.users.models.tenant import Tenant, Outlet
 from app.utils.sms_utils import SMSUtils
+from app.services.communication.models.otp import OTPModel
+from datetime import datetime, timedelta, timezone
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -215,6 +217,38 @@ def user_otp_generate(session, data):
     otp = SMSUtils().generate_otp(session, data.phone)
 
     return otp
+
+
+def verify_user_otp(db, request):
+    otp_entry = (
+        db.query(OTPModel)
+        .filter(OTPModel.phone_number == request.phone_number)
+        .order_by(OTPModel.created_at.desc())
+        .first()
+    )
+
+    if not otp_entry:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invalid OTP.")
+
+    now = datetime.now(timezone.utc)
+
+    # Ensure created_at is timezone-aware
+    if otp_entry.created_at.tzinfo is None:
+        otp_created_at = otp_entry.created_at.replace(tzinfo=timezone.utc)
+    else:
+        otp_created_at = otp_entry.created_at
+
+    if now - otp_created_at > timedelta(minutes=5):
+        db.delete(otp_entry)
+        db.commit()
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="OTP expired.")
+
+    if otp_entry.otp != request.otp:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid OTP.")
+
+    db.delete(otp_entry)
+    db.commit()
+    return True
 
 
 

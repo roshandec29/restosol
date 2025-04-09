@@ -1,7 +1,6 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, constr
 from datetime import datetime
 from typing import List, Optional
-
 
 class Token(BaseModel):
     access_token: str
@@ -120,5 +119,11 @@ class AddressResponse(AddressBase):
 class UserResponseWithToken(UserResponse, Token):
     pass
 
+
 class OTPRequest(BaseModel):
     phone: str
+
+
+class VerifyOTPRequest(BaseModel):
+    phone_number: constr(min_length=10, max_length=15)
+    otp: constr(min_length=6, max_length=6)

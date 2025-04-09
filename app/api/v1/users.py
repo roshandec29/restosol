@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 
 from app.services.users.utils.token_utils import create_access_token, create_refresh_token, decode_token
 from app.services.communication.utils.email import send_email, registration_email
-from app.db.schema.user_schema import Token, UserResponse, UserRegisterRequest, UserResponseWithToken, OTPRequest
-from app.services.users.user_service import authenticate_user, get_user, user_registration, UserService, user_otp_generate
+from app.db.schema.user_schema import Token, UserResponse, UserRegisterRequest, UserResponseWithToken, OTPRequest, VerifyOTPRequest
+from app.services.users.user_service import authenticate_user, get_user, user_registration, UserService, user_otp_generate, verify_user_otp
 from app.db.session import DBSync, DBManager, get_db
 import asyncio
 router = APIRouter()
@@ -15,8 +15,29 @@ router = APIRouter()
 async def request_otp(data: OTPRequest):
     session = DBSync().get_new_session()
     otp = user_otp_generate(session, data)
+    if otp:
+        return {"message": f"OTP sent successfully. {otp}"}
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="OTP not sent"
+        )
 
-    return {"message": f"OTP sent successfully. {otp}"}
+
+@router.post("/auth/verify-otp", status_code=status.HTTP_200_OK)
+def verify_otp(request: VerifyOTPRequest, db: Session = Depends(get_db)):
+    # Fetch OTP entry
+    session = DBSync().get_new_session()
+
+    verified = verify_user_otp(session, request)
+
+    if verified:
+        return {"message": "OTP verified successfully."}
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="Not a valid OTP"
+        )
 
 
 @router.post("/token", response_model=Token)
